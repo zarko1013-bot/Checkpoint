@@ -1,0 +1,223 @@
+{
+  "name": "Cursos n8n",
+  "nodes": [
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=instrucción del usuario {{ $json.chatInput }}",
+        "options": {
+          "systemMessage": "#Rol\nEmprendedora y creadora de cursos. Apasionada por compartir conocimientos y experiencias a través de cursos digitales diseñados para enseñar, inspirar y ayudar a otras personas a desarrollar nuevas habilidades.\n\n#Ámbito y objetivo\nEducación digital y formación online, con el propósito de ofrecer cursos accesibles y prácticos que permitan a las personas adquirir conocimientos, desarrollar habilidades y alcanzar sus metas personales o profesionales.\n\n#Tono y formato de salida\nResponder de manera clara, natural y profesional, utilizando un lenguaje fácil de comprender. Todas las respuestas deben tener un máximo de 500 caracteres, priorizando la información relevante y evitando explicaciones innecesariamente extensas.\n\n#Escalamiento y respuesta\nSi no puede resolver la consulta o encontrar la información solicitada, deberá derivar al usuario con un operador o representante de atención al cliente. Informará amablemente que será atendido a la brevedad, solicitando paciencia y agradeciendo su comprensión y espera.",
+          "maxIterations": 10
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -240,
+        -224
+      ],
+      "id": "c989c2ca-172f-40c1-b92e-f2d47a48cf23",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.5,
+      "position": [
+        -432,
+        -224
+      ],
+      "id": "26d2bd78-3a7a-4779-9822-e964286c74ae",
+      "name": "When chat message received",
+      "webhookId": "37969d19-ff91-41f9-bcde-8dde0f0980d5"
+    },
+    {
+      "parameters": {
+        "model": "openai/gpt-oss-20b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        -240,
+        0
+      ],
+      "id": "2935a6b2-e385-4606-9c77-7f2a5f28b160",
+      "name": "Groq Chat Model",
+      "credentials": {
+        "groqApi": {
+          "id": "WoJwMW2eXcB0rxXN",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Get row(s) in sheet in Google Sheets",
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1FtNove9iSJfAT4wzeb9nV6VEI6CVaWaBs4f-7q3cAF8/edit?gid=1703904348#gid=1703904348",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1703904348,
+          "mode": "list",
+          "cachedResultName": "Cursos",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1FtNove9iSJfAT4wzeb9nV6VEI6CVaWaBs4f-7q3cAF8/edit#gid=1703904348"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        -96,
+        -16
+      ],
+      "id": "f052f015-081f-4d3b-94eb-fb6f252ebda1",
+      "name": "BD Cursos",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "ywoblrNfH61il5Tl",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "contextWindowLength": 10
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.4,
+      "position": [
+        -144,
+        176
+      ],
+      "id": "1910de9f-33dc-4255-bdd3-15cfa8962a3f",
+      "name": "Memory"
+    },
+    {
+      "parameters": {
+        "sendTo": "zarko1013@gmail.com",
+        "subject": "Informe",
+        "message": "={{ $json.output }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        224,
+        -224
+      ],
+      "id": "6a9ecb6b-9fa9-4ff9-97e6-5bd9d69a87f7",
+      "name": "Send a message",
+      "webhookId": "31e189a4-ee29-4068-9977-0aceb036097a",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "yZakhcq2cgrVL51Y",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "markdownToHtml",
+        "markdown": "={{ $json.output }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.markdown",
+      "typeVersion": 1,
+      "position": [
+        64,
+        -224
+      ],
+      "id": "3bd4454f-aad7-44d6-bee2-1c7e09e44119",
+      "name": "Markdown"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Markdown",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "BD Cursos": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Markdown": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "28e31a37-9692-4690-b5ab-0e206c1ad1e4",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "90c7fcbe2364e98693e480664cf6134465068a1895fc60c2ddf3e35557843463"
+  },
+  "nodeGroups": [],
+  "id": "5DOXUZ1DqHJGZRh2",
+  "tags": []
+}
